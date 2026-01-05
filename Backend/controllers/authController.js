@@ -62,7 +62,6 @@ exports.login = async(req, res)=>{
 
 exports.loginusers = async (req , res)=>{
      try {
-        // req.user.id comes from your authMiddleware
         const user = await User.findById(req.user.id).select("-password");
         if (!user) return res.status(404).json({ error: "User not found" });
         res.status(200).json(user);
@@ -71,8 +70,7 @@ exports.loginusers = async (req , res)=>{
     }
 }
 
-
-exports.updateProfile = async(req, res)=>{
+exports.updateProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
 
@@ -80,14 +78,23 @@ exports.updateProfile = async(req, res)=>{
     user.name = req.body.name || user.name;
     user.bio = req.body.bio || user.bio;
 
-    if( req.file){
-      user.profilePic = req.file.filename;
-    } await user.save();
-    res.json({message: "Profile updated Successfully" , user});
+    if (req.file) {
+      user.profilePic = req.file.path;       
+      user.profilePicId = req.file.filename; 
+    }
+
+    await user.save();
+
+    res.json({
+      message: "Profile updated Successfully",
+      user,
+    });
   } catch (error) {
-    res.status(500).json({error: "Profile updated failed"})
+    console.error(error);
+    res.status(500).json({ error: "Profile update failed" });
   }
 };
+
 
 exports.getProfile = async (req, res) => {
   const user = await User.findById(req.user.id)
@@ -116,11 +123,10 @@ exports.followUser = async (req , res) => {
     }
 
     if(currentUser.following.includes(userToFollow._id)){
-      // UNFOLLOW
       currentUser.following.pull(userToFollow._id);
       userToFollow.followers.pull(currentUser._id);
     } else {
-      // FOLLOW
+      
       currentUser.following.push(userToFollow._id);
       userToFollow.followers.push(currentUser._id);
     }
@@ -181,7 +187,7 @@ exports.getUserProfile = async (req, res) => {
 };
 
 
-// in authController.js
+
 
 exports.getUserFollowers = async (req, res) => {
   const { id } = req.params;
@@ -189,7 +195,7 @@ exports.getUserFollowers = async (req, res) => {
     const user = await User.findById(id).populate("followers", "username name profilePic");
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    res.json(user.followers); // returns array of users
+    res.json(user.followers);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -202,7 +208,7 @@ exports.getUserFollowing = async (req, res) => {
     const user = await User.findById(id).populate("following", "username name profilePic");
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    res.json(user.following); // returns array of users
+    res.json(user.following); 
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -253,25 +259,22 @@ exports.forgotPassword = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Generate token
     const resetToken = crypto.randomBytes(32).toString("hex");
 
-    // Hash token
+  
     const hashedToken = crypto
       .createHash("sha256")
       .update(resetToken)
       .digest("hex");
 
-    // Save token + expiry
     user.resetPasswordToken = hashedToken;
     user.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
 
     await user.save({ validateBeforeSave: false });
 
-    // Reset URL
+   
     const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
-    // Email content
     const html = `
       <h2>Password Reset</h2>
       <p>You requested to reset your password.</p>
@@ -282,7 +285,7 @@ exports.forgotPassword = async (req, res) => {
       <p>This link will expire in 10 minutes.</p>
     `;
 
-    // SEND EMAIL ✅
+   
     await sendEmail({
       to: user.email,
       subject: "Reset Your Password",
@@ -339,7 +342,7 @@ exports.globalSearch = async (req, res) => {
       return res.json({ users: [], posts: [] });
     }
 
-    const regex = new RegExp(q, "i"); // case-insensitive
+    const regex = new RegExp(q, "i"); 
 
     const users = await User.find({
       $or: [{ username: regex }, { name: regex }]

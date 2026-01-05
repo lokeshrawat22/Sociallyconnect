@@ -1,28 +1,31 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { IoIosHome } from "react-icons/io";
+import Navlogo from '../assets/Navlogo1.jpeg'
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      {/* Navbar */}
+      
       <nav className="w-full bg-white border-b border-gray-200 fixed top-0 z-50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between h-16">
 
-            {/* Logo */}
+           
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center">
-                🌐
+              <div className="w-13 h-8 rounded-full border border-gray-300 flex items-center justify-center">
+                 <img src={Navlogo} alt="" />
               </div>
-              <span className="text-lg font-semibold text-gray-800">
-                Socially<span className="text-blue-600">Connect</span>
+              
+              <span className="text-lg font-semibold text-blue-950">
+               
+                Socially<span className="text-cyan-500">Connect</span>
               </span>
             </div>
 
-            {/* Desktop Links */}
+          
             <div className="hidden md:flex items-center space-x-8">
               <NavLink to="/feed" label="Home" />
               <NavLink to="/privacypolicy" label="Privacy Policy" />
@@ -31,7 +34,7 @@ const Navbar = () => {
               <NavLink to="/login" label="Login" />
             </div>
 
-            {/* Mobile Toggle */}
+            
             <button
               onClick={() => setOpen(true)}
               className="md:hidden text-gray-600"
@@ -55,7 +58,7 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Overlay */}
+      
       {open && (
         <div
           onClick={() => setOpen(false)}
@@ -63,7 +66,6 @@ const Navbar = () => {
         />
       )}
 
-      {/* Mobile Menu */}
       <div
         className={`fixed top-0 left-0 h-full w-70  bg-white z-50 transform transition-transform duration-300 ease-in-out
         ${open ? "translate-x-0" : "-translate-x-full"}`}
@@ -88,7 +90,7 @@ const Navbar = () => {
   );
 };
 
-/* Reusable Components */
+
 const NavLink = ({ to, label }) => (
   <Link
     to={to}

@@ -1,28 +1,36 @@
 const mongoose = require("mongoose");
 
-const userSchema = new mongoose.Schema({
-  username: { type: String, unique: true },
-  name: String,
-  bio: String,
-  email: { type: String, unique: true },
-  password: String,
-  profilePic: String,
+const userSchema = new mongoose.Schema(
+  {
+    username: { type: String, unique: true },
+    name: String,
+    bio: String,
+    email: { type: String, unique: true },
+    password: String,
 
-  followers: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
-    },
-  ],
-  following: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
-    },
-  ],
+    // ✅ Cloudinary image URL
+    profilePic: String,
 
-  resetPasswordToken: String,
-  resetPasswordExpire: Date,
-});
+    // ✅ Cloudinary public_id (important)
+    profilePicId: String,
+
+    followers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+      },
+    ],
+    following: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+      },
+    ],
+
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
+  },
+  { timestamps: true }
+);
 
 module.exports = mongoose.model("user", userSchema);

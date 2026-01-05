@@ -89,7 +89,7 @@ const Register = () => {
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold py-3 rounded-full shadow-lg hover:shadow-xl transition-shadow"
+          className="w-full bg-linear-to-r from-purple-600 to-blue-500 text-white font-semibold py-3 rounded-full shadow-lg hover:shadow-xl transition-shadow"
         >
           CREATE ACCOUNT
         </button>

@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import API from "../api";
 import { toast } from "react-toastify";
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 const CreatePost = () => {
   const [form, setForm] = useState({
@@ -11,36 +13,59 @@ const CreatePost = () => {
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  /* ================= CLEANUP PREVIEW ================= */
+  useEffect(() => {
+    return () => {
+      if (preview) URL.revokeObjectURL(preview);
+    };
+  }, [preview]);
+
+  /* ================= FILE CHANGE ================= */
+  const handleFileChange = (e) => {
+    const selected = e.target.files[0];
+    if (!selected) return;
+
+    if (selected.size > MAX_FILE_SIZE) {
+      toast.error("File must be under 10MB");
+      return;
+    }
+
+    if (preview) URL.revokeObjectURL(preview);
+
+    setFile(selected);
+    setPreview(URL.createObjectURL(selected));
+  };
+
+  /* ================= SUBMIT ================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!file) return alert("Please select an image or video");
+
+    if (!file) {
+      toast.error("Please select an image or video");
+      return;
+    }
 
     setLoading(true);
+
     try {
       const data = new FormData();
       data.append("title", form.title);
       data.append("description", form.description);
-      data.append("media", file);
+      data.append("media", file); // 🔑 must match backend
 
       await API.post("/auth/posts", data);
-      toast.success("Post uploaded");
+
+      toast.success("Post uploaded successfully");
 
       setForm({ title: "", description: "" });
       setFile(null);
       setPreview(null);
     } catch (err) {
-      toast.error("Upload failed");
+      toast.error(
+        err.response?.data?.error || "Upload failed"
+      );
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleFileChange = (e) => {
-    const selected = e.target.files[0];
-    setFile(selected);
-
-    if (selected) {
-      setPreview(URL.createObjectURL(selected));
     }
   };
 
@@ -70,7 +95,10 @@ const CreatePost = () => {
           value={form.description}
           placeholder="Write something..."
           onChange={(e) =>
-            setForm({ ...form, description: e.target.value })
+            setForm({
+              ...form,
+              description: e.target.value,
+            })
           }
           className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 resize-none"
           rows={3}
@@ -96,6 +124,7 @@ const CreatePost = () => {
             {file?.type.startsWith("image") ? (
               <img
                 src={preview}
+                alt="Preview"
                 className="w-full h-52 object-cover"
               />
             ) : (
@@ -111,7 +140,7 @@ const CreatePost = () => {
         {/* Submit */}
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || !file}
           className="w-full py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-60"
         >
           {loading ? "Uploading..." : "Upload Post"}

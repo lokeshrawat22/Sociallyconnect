@@ -1,12 +1,13 @@
 const multer = require("multer");
-const path = require("path");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("../config/cloudinary");
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/posts");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "profile_pics", // Cloudinary folder
+    allowed_formats: ["jpg", "jpeg", "png", "webp"],
+    public_id: () => `profile_${Date.now()}`,
   },
 });
 
@@ -16,13 +17,10 @@ const uploadPost = multer({
     fileSize: 10 * 1024 * 1024, // 10MB
   },
   fileFilter: (req, file, cb) => {
-    if (
-      file.mimetype.startsWith("image") ||
-      file.mimetype.startsWith("video")
-    ) {
-      return cb(null, true);
+    if (file.mimetype.startsWith("image")) {
+      cb(null, true);
     } else {
-      return cb(new Error("Only image or video allowed"));
+      cb(new Error("Only image allowed"));
     }
   },
 });

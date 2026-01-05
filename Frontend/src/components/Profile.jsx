@@ -3,6 +3,7 @@ import API from "../api";
 import { Link, useNavigate } from "react-router-dom";
 import MyPosts from "./MyPosts";
 import { toast } from "react-toastify";
+import DefaultProfile from '../assets/defaultprofile.webp'
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -22,107 +23,97 @@ const Profile = () => {
     fetchProfile();
   }, []);
 
-  if (!user) return <p className="text-center mt-10">Loading...</p>;
+  if (!user)
+    return (
+      <p className="text-center mt-10 text-gray-400">
+        Loading...
+      </p>
+    );
 
   return (
-    <div className="max-w-6xl mx-auto px-4 pt-24 pb-10">
+    <div className="min-h-screen bg-gray-50 pt-24 pb-10 px-4">
+      <div className="max-w-6xl mx-auto">
 
+        <div className="bg-white rounded-2xl shadow-md p-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
 
-      {/* ================= PROFILE CARD ================= */}
-      <div className="bg-white rounded-2xl shadow-lg p-6">
+            <div className="flex flex-col sm:flex-row items-center gap-6">
+              <img
+                src={user.profilePic || `${DefaultProfile}`}
+                alt="profile"
+                className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-[#FAD4CF]"
+              />
 
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+              <div className="text-center sm:text-left">
+                <h2 className="text-2xl font-semibold text-gray-800">
+                  {user.name}
+                </h2>
 
-          {/* LEFT : AVATAR + INFO */}
-          <div className="flex flex-col sm:flex-row items-center gap-6">
-            <img
-              src={
-                user.profilePic
-                  ? `http://localhost:3000/uploads/posts/${user.profilePic}`
-                  : "/default-avatar.png"
-              }
-              alt="profile"
-              className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-gray-300"
-            />
-
-            <div className="text-center sm:text-left">
-              <h2 className="text-2xl font-semibold text-gray-800">
-                {user.name}
-              </h2>
-
-              <p
-                className="text-indigo-600 text-lg"
-                style={{ fontFamily: "cursive" }}
-              >
-                @{user.username}
-              </p>
-
-              <p className="text-sm text-gray-400">
-                {user.email}
-              </p>
-
-              {user.bio && (
-                <p className="text-sm text-gray-500 mt-1 max-w-sm">
-                  {user.bio}
+                <p className="text-sm font-medium text-[#F36B5E]">
+                  @{user.username}
                 </p>
-              )}
 
-              {/* ACTION BUTTONS */}
-              <div className="mt-4 flex flex-wrap justify-center sm:justify-start gap-3">
-                <Link to="/updateProfile">
-                  <button className="px-5 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 transition">
-                    Edit Profile
-                  </button>
-                </Link>
+                
 
-                <Link to="/createPost">
-                  <button className="px-5 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition">
-                    Create Post
-                  </button>
-                </Link>
+                {user.bio && (
+                  <p className="text-sm text-gray-600 mt-1 max-w-sm">
+                    {user.bio}
+                  </p>
+                )}
+
+                <div className="mt-4 flex flex-wrap justify-center sm:justify-start gap-3">
+                  <Link to="/updateProfile">
+                    <button className="px-5 py-2 rounded-full bg-[#F36B5E] text-white text-sm font-medium hover:bg-[#E85A4F] transition">
+                      Edit Profile
+                    </button>
+                  </Link>
+
+                  <Link to="/createPost">
+                    <button className="px-5 py-2 rounded-full border border-[#F36B5E] text-[#F36B5E] text-sm font-medium hover:bg-[#FFF1EE] transition">
+                      Create Post
+                    </button>
+                  </Link>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* RIGHT : FOLLOWERS / FOLLOWING (INLINE LIKE BEFORE) */}
-          <div className="flex flex-col items-center md:items-end gap-3">
+            <div className="flex flex-col items-center md:items-end gap-4">
+              <div className="flex gap-6 text-sm">
+                <Link
+                  to={`/followers/${user._id}`}
+                  className="flex gap-1 hover:text-[#F36B5E] transition"
+                >
+                  <span className="font-bold text-gray-800">
+                    {user.followers?.length || 0}
+                  </span>
+                  <span className="text-gray-600">Followers</span>
+                </Link>
 
-            <div className="flex gap-6 text-sm text-gray-600">
-              <Link
-                to={`/followers/${user._id}`}
-                className="flex gap-1 hover:text-indigo-600 transition"
+                <Link
+                  to={`/following/${user._id}`}
+                  className="flex gap-1 hover:text-[#F36B5E] transition"
+                >
+                  <span className="font-bold text-gray-800">
+                    {user.following?.length || 0}
+                  </span>
+                  <span className="text-gray-600">Following</span>
+                </Link>
+              </div>
+
+              <button
+                onClick={logout}
+                className="text-sm font-medium text-[#F36B5E] hover:text-[#E85A4F]"
               >
-                <span className="font-bold text-gray-800">
-                  {user.followers?.length || 0}
-                </span>
-                <span>Followers</span>
-              </Link>
-
-              <Link
-                to={`/following/${user._id}`}
-                className="flex gap-1 hover:text-indigo-600 transition"
-              >
-                <span className="font-bold text-gray-800">
-                  {user.following?.length || 0}
-                </span>
-                <span>Following</span>
-              </Link>
+                Logout
+              </button>
             </div>
-
-            {/* LOGOUT */}
-            <button
-              onClick={logout}
-              className="text-sm text-red-500 hover:text-red-600 font-medium"
-            >
-              Logout
-            </button>
           </div>
         </div>
-      </div>
 
-      {/* ================= MY POSTS ================= */}
-      <div className="mt-10">
-        <MyPosts />
+        <div className="mt-10">
+          <MyPosts />
+        </div>
+
       </div>
     </div>
   );

@@ -1,7 +1,6 @@
-const Post = require('../models/Post.js');
-const User = require('../models/User.js');
+const Post = require("../models/Post.js");
+const User = require("../models/User.js");
 
-/* CREATE POST */
 exports.createPost = async (req, res) => {
   try {
     const loggedInUser = await User.findById(req.user.id);
@@ -10,26 +9,30 @@ exports.createPost = async (req, res) => {
       return res.status(400).json({ error: "Media file is required" });
     }
 
+    const isVideo = req.file.mimetype.startsWith("video");
+
     const post = new Post({
       user: loggedInUser._id,
       title: req.body.title,
       description: req.body.description,
-      media: req.file.filename,
-      mediaType: req.file.mimetype.startsWith("image")
-        ? "image"
-        : "video",
+      media: req.file.path,
+      mediaPublicId: req.file.filename,
+      mediaType: isVideo ? "video" : "image",
     });
 
     await post.save();
-    res.status(201).json({ message: "Post created", post });
 
+    res.status(201).json({
+      message: "Post created",
+      post,
+    });
   } catch (err) {
-    console.error(err);
+    console.error("CREATE POST ERROR:", err);
     res.status(500).json({ error: "Post upload failed" });
   }
 };
 
-/* GET ALL POSTS */
+
 exports.getAllPosts = async (req, res) => {
   try {
     const currentUserId = req.user?.id || req.user?._id;
@@ -54,8 +57,8 @@ exports.getAllPosts = async (req, res) => {
           username: post.user.username,
           name: post.user.name,
           profilePic: post.user.profilePic,
-          isFollowed
-        }
+          isFollowed,
+        },
       };
     });
 
@@ -66,7 +69,8 @@ exports.getAllPosts = async (req, res) => {
   }
 };
 
-/* GET MY POSTS */
+
+
 exports.getMyPosts = async (req, res) => {
   try {
     const posts = await Post.find({ user: req.user.id })
@@ -74,10 +78,9 @@ exports.getMyPosts = async (req, res) => {
       .populate("comments.user", "username profilePic")
       .sort({ createdAt: -1 });
 
-    // ✅ ADD commentCount
     const formattedPosts = posts.map(post => ({
       ...post.toObject(),
-      commentCount: post.comments.length
+      commentCount: post.comments.length,
     }));
 
     res.json(formattedPosts);
@@ -88,9 +91,9 @@ exports.getMyPosts = async (req, res) => {
 };
 
 
-/* LIKE / UNLIKE POST */
 exports.likePost = async (req, res) => {
   const post = await Post.findById(req.params.id);
+
   if (!post) {
     return res.status(404).json({ message: "Post not found" });
   }
@@ -109,13 +112,13 @@ exports.likePost = async (req, res) => {
   res.json({ likes: post.likes.length });
 };
 
-/* ADD COMMENT */
+
 exports.addComment = async (req, res) => {
   const post = await Post.findById(req.params.id);
 
   post.comments.push({
     user: req.user.id,
-    text: req.body.text
+    text: req.body.text,
   });
 
   await post.save();
@@ -126,7 +129,7 @@ exports.addComment = async (req, res) => {
   res.json(populatedPost.comments);
 };
 
-/* GET COMMENTS */
+
 exports.getPostComments = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id)
@@ -141,7 +144,7 @@ exports.getPostComments = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: "Failed to fetch comments",
-      error: error.message
+      error: error.message,
     });
   }
 };

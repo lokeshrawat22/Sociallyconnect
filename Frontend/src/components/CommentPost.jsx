@@ -65,8 +65,7 @@ const CommentPost = ({ postId, refresh }) => {
             <img
               src={
                 comment.user?.profilePic
-                  ? `http://localhost:3000/uploads/posts/${comment.user.profilePic}`
-                  : "/default-avatar.png"
+                  || "/default-avatar.png"
               }
               className="w-8 h-8 rounded-full object-cover"
             />

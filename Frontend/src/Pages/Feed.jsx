@@ -8,7 +8,7 @@ const Feed = () => {
 
   const fetchPosts = async () => {
     const res = await API.get("/auth/posts");
-    setPosts(res.data.reverse()); // newest posts first
+    setPosts(res.data.reverse()); 
   };
 
   useEffect(() => {
@@ -19,7 +19,6 @@ const Feed = () => {
     <div className="bg-gray-100 min-h-screen py-8 mt-10">
 
 
-      {/* GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-10 justify-items-center mx-10">
   {posts.map((post) => (
     <PostCard

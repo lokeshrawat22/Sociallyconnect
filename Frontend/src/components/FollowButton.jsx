@@ -9,7 +9,7 @@ const FollowButton = ({ userId, currentUserId, isInitiallyFollowing }) => {
   // 🚫 Prevent self-follow
   if (!userId || userId === currentUserId) return null;
 
-  // ✅ SYNC FOLLOW STATE AFTER REFRESH
+  // 🔄 Sync follow state
   useEffect(() => {
     setIsFollowing(!!isInitiallyFollowing);
   }, [isInitiallyFollowing]);
@@ -19,18 +19,12 @@ const FollowButton = ({ userId, currentUserId, isInitiallyFollowing }) => {
 
     try {
       setLoading(true);
-
       await API.put(`/auth/users/${userId}/follow`);
-
       setIsFollowing(prev => !prev);
 
-      toast.success(
-        isFollowing ? "Unfollowed successfully" : "Followed successfully"
-      );
+      toast.success(isFollowing ? "Unfollowed" : "Followed");
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Failed to update follow status"
-      );
+      toast.error("Failed to update follow status");
     } finally {
       setLoading(false);
     }
@@ -40,13 +34,18 @@ const FollowButton = ({ userId, currentUserId, isInitiallyFollowing }) => {
     <button
       onClick={toggleFollow}
       disabled={loading}
-      className={`px-3 py-1 rounded text-sm transition ${
-        isFollowing
-          ? "bg-gray-300 text-black hover:bg-gray-400"
-          : "bg-indigo-600 text-white hover:bg-indigo-700"
-      } disabled:opacity-60`}
+      className={`
+        px-5 py-1.5 rounded-full text-sm font-medium
+        transition-all duration-200
+        disabled:opacity-60 disabled:cursor-not-allowed
+        ${
+          isFollowing
+            ? "border border-[#FFD3CD] text-[#FF6B5E] bg-white hover:bg-[#FF6B5E] hover:text-white"
+            : "bg-[#FF6B5E] text-white hover:bg-[#E85A4F]"
+        }
+      `}
     >
-      {loading ? "Please wait..." : isFollowing ? "Unfollow" : "Follow"}
+      {loading ? "Please wait..." : isFollowing ? "Following" : "Follow"}
     </button>
   );
 };
