@@ -1,20 +1,34 @@
-const nodemailer = require("nodemailer");
+const axios = require("axios");
 
 const sendEmail = async ({ to, subject, html }) => {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+  try {
+    const response = await axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        sender: {
+          name: "SociallyConnect",
+          email: process.env.BREVO_FROM_EMAIL,
+        },
+        to: [{ email: to }],
+        subject,
+        htmlContent: html,
+      },
+      {
+        headers: {
+          "api-key": process.env.BREVO_API_KEY,
+          "content-type": "application/json",
+        },
+      }
+    );
 
-  await transporter.sendMail({
-    from: `"Support" <${process.env.EMAIL_USER}>`,
-    to,
-    subject,
-    html,
-  });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "BREVO EMAIL ERROR:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
 };
 
 module.exports = sendEmail;
