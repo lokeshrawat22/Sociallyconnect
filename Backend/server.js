@@ -28,7 +28,7 @@ const server = http.createServer(app);
 // SOCKET.IO
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "https://sociallyconnect-1.onrender.com/",
     credentials: true
   }
 });

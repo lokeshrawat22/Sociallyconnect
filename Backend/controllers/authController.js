@@ -325,10 +325,14 @@ exports.forgotPassword = async (req, res) => {
 
           <p style="font-size:13px; color:#6b7280;">
 <<<<<<< HEAD
+<<<<<<< HEAD
              <strong>Security Notice:</strong><br/>
 =======
             ⚠️ <strong>Security Notice:</strong><br/>
 >>>>>>> f8bc2f6 (Local changes before syncing with GitHub)
+=======
+            ⚠️ <strong>Security Notice:</strong><br/>
+>>>>>>> c828c12beb9747ad0664e5e691aa98155373c20f
             If you did not request a password reset, please ignore this email.
             Your account will remain secure.
           </p>
