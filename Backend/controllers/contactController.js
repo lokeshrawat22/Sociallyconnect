@@ -1,6 +1,5 @@
 const Contact = require("../models/Contactus");
 const sendEmail = require("../utils/sendEmail");
-
 exports.contactUs = async (req, res) => {
   try {
     const { name, email, message } = req.body;
@@ -9,57 +8,40 @@ exports.contactUs = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // ✅ Save to DB
-    await Contact.create({
-      name,
-      email,
-      message,
+   
+    await Contact.create({ name, email, message });
+
+    res.status(201).json({
+      success: true,
+      message: "Message received successfully",
     });
 
-    // ✅ Send thank-you email WITH USER MESSAGE
-    await sendEmail({
+    sendEmail({
       to: email,
       subject: "Thanks for contacting SociallyConnect",
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6;">
           <h2>Hi ${name}, 👋</h2>
+          <p>Thank you for contacting <strong>SociallyConnect</strong>.</p>
+          <p>We’ll get back to you within <strong>24–48 hours</strong>.</p>
 
-          <p>
-            Thank you for contacting <strong>SociallyConnect</strong>.
-          </p>
-
-          <p>
-            We have received your message and our team will get back to you within
-            <strong>24–48 hours</strong>.
-          </p>
-
-          <hr style="margin: 20px 0;" />
+          <hr/>
 
           <p><strong>Your message:</strong></p>
-
           <div style="
-            background: #f4f6f8;
-            padding: 12px 16px;
-            border-left: 4px solid #2563eb;
-            border-radius: 6px;
-            color: #333;
+            background:#f4f6f8;
+            padding:12px;
+            border-left:4px solid #2563eb;
+            border-radius:6px;
           ">
             ${message}
           </div>
 
-          <br/>
-
-          <p>
-            Regards,<br/>
-            <strong>SociallyConnect Team</strong> 💙
-          </p>
+          <p>Regards,<br/><strong>SociallyConnect Team</strong> 💙</p>
         </div>
       `,
-    });
-
-    res.status(201).json({
-      success: true,
-      message: "Message received successfully",
+    }).catch(err => {
+      console.error("EMAIL ERROR:", err);
     });
 
   } catch (error) {
