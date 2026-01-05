@@ -324,7 +324,11 @@ exports.forgotPassword = async (req, res) => {
           <hr style="margin:30px 0;" />
 
           <p style="font-size:13px; color:#6b7280;">
+<<<<<<< HEAD
              <strong>Security Notice:</strong><br/>
+=======
+            ⚠️ <strong>Security Notice:</strong><br/>
+>>>>>>> f8bc2f6 (Local changes before syncing with GitHub)
             If you did not request a password reset, please ignore this email.
             Your account will remain secure.
           </p>
@@ -355,7 +359,6 @@ exports.forgotPassword = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 
 exports.resetPassword = async (req, res) => {

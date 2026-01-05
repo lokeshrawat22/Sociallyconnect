@@ -16,7 +16,12 @@ exports.contactUs = async (req, res) => {
       message: "Message received successfully",
     });
 
+<<<<<<< HEAD
    sendEmail({
+=======
+    
+  sendEmail({
+>>>>>>> f8bc2f6 (Local changes before syncing with GitHub)
   to: email,
   subject: "We’ve received your message – SociallyConnect",
   html: `
