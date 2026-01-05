@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const API = axios.create({
-    baseURL : "http://localhost:3000/api"
+    baseURL : "https://sociallyconnect-g0gs.onrender.com/api"
 });
 
 API.interceptors.request.use((req)=>{
