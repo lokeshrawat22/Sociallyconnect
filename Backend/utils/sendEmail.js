@@ -1,19 +1,18 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp-relay.brevo.com",
+  port: 587,
+  secure: false,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: process.env.BREVO_SMTP_LOGIN,
+    pass: process.env.BREVO_SMTP_KEY,
   },
-  pool: true,             
-  maxConnections: 5,
-  maxMessages: 100,
 });
 
 const sendEmail = async ({ to, subject, html }) => {
   return transporter.sendMail({
-    from: `"Support" <${process.env.EMAIL_USER}>`,
+    from: `SociallyConnect <${process.env.BREVO_FROM_EMAIL}>`,
     to,
     subject,
     html,
