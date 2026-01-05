@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import API from "../api";
 import { Link } from "react-router-dom";
 import PostCard from "../components/PostCard";
-import Searching from '../assets/Navlogo.png'
+import Searching from '../assets/navlogo.png'
 import DefaultProfile from '../assets/defaultprofile.webp'
 
 const Search = ({ currentUserId }) => {
