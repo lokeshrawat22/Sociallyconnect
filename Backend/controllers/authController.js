@@ -250,7 +250,6 @@ exports.getUserPosts = async (req, res) => {
 
 
 
-
 exports.forgotPassword = async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
@@ -261,7 +260,6 @@ exports.forgotPassword = async (req, res) => {
 
     const resetToken = crypto.randomBytes(32).toString("hex");
 
-  
     const hashedToken = crypto
       .createHash("sha256")
       .update(resetToken)
@@ -272,27 +270,85 @@ exports.forgotPassword = async (req, res) => {
 
     await user.save({ validateBeforeSave: false });
 
-   
     const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
     const html = `
-      <h2>Password Reset</h2>
-      <p>You requested to reset your password.</p>
-      <a href="${resetUrl}" 
-         style="padding:10px 20px;background:#4f46e5;color:white;text-decoration:none;border-radius:5px;">
-         Reset Password
-      </a>
-      <p>This link will expire in 10 minutes.</p>
+      <div style="font-family: Arial, sans-serif; background:#f9fafb; padding:30px;">
+        <div style="
+          max-width:600px;
+          margin:auto;
+          background:white;
+          padding:30px;
+          border-radius:10px;
+          box-shadow:0 10px 25px rgba(0,0,0,0.05);
+        ">
+
+          <h2 style="color:#111827;">Reset your password</h2>
+
+          <p style="color:#374151;">
+            We received a request to reset the password for your
+            <strong>SociallyConnect</strong> account.
+          </p>
+
+          <p style="color:#374151;">
+            Click the button below to create a new password.
+            This link is valid for <strong>10 minutes</strong>.
+          </p>
+
+          <div style="text-align:center; margin:30px 0;">
+            <a href="${resetUrl}" style="
+              display:inline-block;
+              padding:12px 24px;
+              background:#4f46e5;
+              color:#ffffff;
+              text-decoration:none;
+              border-radius:6px;
+              font-weight:bold;
+            ">
+              Reset Password
+            </a>
+          </div>
+
+          <p style="font-size:14px; color:#6b7280;">
+            If the button doesn’t work, copy and paste this link into your browser:
+          </p>
+
+          <p style="
+            font-size:14px;
+            word-break:break-all;
+            color:#2563eb;
+          ">
+            ${resetUrl}
+          </p>
+
+          <hr style="margin:30px 0;" />
+
+          <p style="font-size:13px; color:#6b7280;">
+            ⚠️ <strong>Security Notice:</strong><br/>
+            If you did not request a password reset, please ignore this email.
+            Your account will remain secure.
+          </p>
+
+          <p style="font-size:13px; color:#6b7280;">
+            For your safety, never share this link with anyone.
+          </p>
+
+          <p style="margin-top:30px; color:#374151;">
+            Regards,<br/>
+            <strong>SociallyConnect Security Team</strong>
+          </p>
+
+        </div>
+      </div>
     `;
 
-   
-    await sendEmail({
+    sendEmail({
       to: user.email,
-      subject: "Reset Your Password",
+      subject: "Reset your SociallyConnect password",
       html,
-    });
+    }).catch(err => console.error("EMAIL ERROR:", err));
 
-    res.json({ message: "Reset link sent to email" });
+    res.json({ message: "Password reset link sent to your email" });
 
   } catch (err) {
     console.error(err);
