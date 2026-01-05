@@ -1,34 +1,16 @@
-const axios = require("axios");
+const { Resend } = require("resend");
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async ({ to, subject, html }) => {
-  try {
-    const response = await axios.post(
-      "https://api.brevo.com/v3/smtp/email",
-      {
-        sender: {
-          name: "SociallyConnect",
-          email: process.env.BREVO_FROM_EMAIL,
-        },
-        to: [{ email: to }],
-        subject,
-        htmlContent: html,
-      },
-      {
-        headers: {
-          "api-key": process.env.BREVO_API_KEY,
-          "content-type": "application/json",
-        },
-      }
-    );
+  await resend.emails.send({
+    from: `SociallyConnect <${process.env.EMAIL_FROM}>`,
+    to,
+    subject,
+    html,
+  });
 
-    return response.data;
-  } catch (error) {
-    console.error(
-      "BREVO EMAIL ERROR:",
-      error.response?.data || error.message
-    );
-    throw error;
-  }
+  console.log("Email sent via Resend");
 };
 
 module.exports = sendEmail;
