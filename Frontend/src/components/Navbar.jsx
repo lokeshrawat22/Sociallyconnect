@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { IoIosHome } from "react-icons/io";
-import Navlogo from '../assets/Navlogo1.jpeg'
+import Navlogo from '../assets/navlogo1.jpeg'
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
