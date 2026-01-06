@@ -3,21 +3,31 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import API from "../api";
 import FollowButton from "../components/FollowButton";
 import PostCard from "../components/PostCard";
-import DefaultProfile from '../assets/defaultprofile.webp'
+import DefaultProfile from "../assets/defaultprofile.webp";
 
 const UserProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const currentUser = JSON.parse(localStorage.getItem("user"));
+  const token = localStorage.getItem("token");
+
+  const loggedInUserId = (() => {
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      return payload.id || payload._id;
+    } catch {
+      return null;
+    }
+  })();
+
+  const isOwnProfile = String(loggedInUserId) === String(id);
 
   useEffect(() => {
-    if (currentUser && String(currentUser._id) === String(id)) {
+    if (isOwnProfile) {
       navigate("/profile", { replace: true });
     }
-  }, [id, currentUser, navigate]);
-
-  const isOwnProfile = String(currentUser?._id) === String(id);
+  }, [isOwnProfile, navigate]);
 
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
@@ -45,6 +55,7 @@ const UserProfile = () => {
   };
 
   const startChat = async () => {
+    if (isOwnProfile) return;
     const res = await API.get(`/auth/conversation/${id}`);
     navigate(`/messages/${res.data._id}`);
   };
@@ -58,16 +69,12 @@ const UserProfile = () => {
       <div className="max-w-6xl mx-auto">
 
         <div className="bg-white rounded-2xl shadow-md p-6">
-
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
 
-           
+            {/* LEFT */}
             <div className="flex flex-col sm:flex-row items-center gap-6">
               <img
-                src={
-                  user.profilePic || `${DefaultProfile}`
-                   
-                }
+                src={user.profilePic || DefaultProfile}
                 alt="profile"
                 className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-[#FAD4CF]"
               />
@@ -87,45 +94,52 @@ const UserProfile = () => {
                   </p>
                 )}
 
-                <div className="mt-4  flex flex-wrap justify-center sm:justify-start gap-3">
+                {!isOwnProfile && (
+                  <div className="mt-4 flex flex-wrap justify-center sm:justify-start gap-3">
+                    <FollowButton
+                      userId={id}
+                      currentUserId={loggedInUserId}
+                      isInitiallyFollowing={user.isFollowed}
+                      className="px-5 py-2 rounded-full bg-[#F36B5E] text-white text-sm font-medium hover:bg-[#E85A4F]"
+                    />
 
-                  <FollowButton
-                    userId={id}
-                    currentUserId={currentUser?._id}
-                    isInitiallyFollowing={user.isFollowed}
-                    className="px-5 py-2 rounded-full bg-[#F36B5E] text-white text-sm font-medium hover:bg-[#E85A4F]"
-                  />
-
-                  <button
-                    onClick={startChat}
-                    className="px-5 py-2 rounded-full border border-[#F36B5E] text-[#F36B5E] text-sm font-medium hover:bg-[#FFF1EE] transition"
-                  >
-                    Message
-                  </button>
-                </div>
+                    <button
+                      onClick={startChat}
+                      className="px-5 py-2 rounded-full border border-[#F36B5E] text-[#F36B5E] text-sm font-medium hover:bg-[#FFF1EE] transition"
+                    >
+                      Message
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="flex gap-6 text-sm">
-              <Link
-                to={`/followers/${user._id}`}
-                className="flex gap-1 hover:text-[#F36B5E] transition"
-              >
-                <span className="font-bold text-gray-800">
-                  {user.followersCount}
-                </span>
-                <span className="text-gray-600">Followers</span>
-              </Link>
+            
 
-              <Link
-                to={`/following/${user._id}`}
-                className="flex gap-1 hover:text-[#F36B5E] transition"
-              >
-                <span className="font-bold text-gray-800">
-                  {user.followingCount}
-                </span>
-                <span className="text-gray-600">Following</span>
-              </Link>
+            <div className="flex flex-col items-center md:items-end gap-4">
+              <div className="flex gap-6 text-sm">
+                <Link
+                  to={`/followers/${user._id}`}
+                  className="flex gap-1 hover:text-[#F36B5E] transition"
+                >
+                  <span className="font-bold text-gray-800">
+                    {user.followersCount}
+                  </span>
+                  <span className="text-gray-600">Followers</span>
+                </Link>
+
+                <Link
+                  to={`/following/${user._id}`}
+                  className="flex gap-1 hover:text-[#F36B5E] transition"
+                >
+                  <span className="font-bold text-gray-800">
+                    
+                    {user.followingCount}
+                  </span>
+                  <span className="text-gray-600">Following</span>
+                </Link>
+              </div>
+
             </div>
           </div>
         </div>
@@ -140,7 +154,7 @@ const UserProfile = () => {
               <PostCard
                 key={post._id}
                 post={post}
-                currentUserId={currentUser?._id}
+                currentUserId={loggedInUserId}
                 refresh={fetchPosts}
               />
             ))
