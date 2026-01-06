@@ -2,12 +2,12 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-800 text-gray-300  ">
-      <div className="max-w-7xl mx-auto px-6 py-6 ">
+    <footer className="bg-gray-800 text-gray-300">
+      <div className="max-w-7xl mx-auto px-6 py-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
 
-          {/* Social Icons */}
-          <div className="flex items-center space-x-4">
+          {/* Social Icons (DESKTOP ONLY) */}
+          <div className="hidden md:flex items-center space-x-4">
             <a href="#" className="hover:text-white transition">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M22 12a10 10 0 1 0-11.5 9.9v-7h-2v-3h2v-2.3c0-2 1.2-3.1 3-3.1.9 0 1.8.1 1.8.1v2h-1c-1 0-1.3.6-1.3 1.2V12h2.3l-.4 3h-1.9v7A10 10 0 0 0 22 12z"/>
@@ -27,13 +27,16 @@ const Footer = () => {
             </a>
           </div>
 
-          {/* Copyright */}
-          <p className="text-sm text-gray-400">
-            © 2026 <span className="font-medium text-gray-300">SociallyConnect - All Rights Reserved</span>
+          {/* COPYRIGHT (MOBILE + DESKTOP) */}
+          <p className="text-sm text-gray-400 text-center md:text-left">
+            © 2026{" "}
+            <span className="font-medium text-gray-300">
+              SociallyConnect - All Rights Reserved
+            </span>
           </p>
 
-          {/* Links */}
-          <div className="flex items-center space-x-4 text-sm">
+          {/* LINKS (DESKTOP ONLY) */}
+          <div className="hidden md:flex items-center space-x-4 text-sm">
             <a href="#" className="hover:text-white transition">
               Privacy Policy
             </a>
