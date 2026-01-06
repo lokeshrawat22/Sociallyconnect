@@ -22,7 +22,7 @@ const FollowButton = ({ userId, currentUserId, isInitiallyFollowing }) => {
       await API.put(`/auth/users/${userId}/follow`);
       setIsFollowing(prev => !prev);
 
-      toast.success(isFollowing ? "Unfollowed" : "Followed");
+     
     } catch (error) {
       toast.error("Failed to update follow status");
     } finally {
