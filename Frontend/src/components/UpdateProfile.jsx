@@ -1,169 +1,117 @@
-import { useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import API from "../api";
-import FollowButton from "../components/FollowButton";
-import PostCard from "../components/PostCard";
-import DefaultProfile from "../assets/defaultprofile.webp";
-
-const UserProfile = () => {
-  const { id } = useParams();
+import {toast} from 'react-toastify';
+import { useNavigate } from "react-router-dom";
+const UpdateProfile = ({ user, onUpdated, onClose }) => {
+  const [form, setForm] = useState({ username: "", name: "" , bio: ""});
+  const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const token = localStorage.getItem("token");
-
-  const loggedInUserId = (() => {
-    if (!token) return null;
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      return payload.id || payload._id;
-    } catch {
-      return null;
-    }
-  })();
-
-  const isOwnProfile = String(loggedInUserId) === String(id);
-
   useEffect(() => {
-    if (isOwnProfile) {
-      navigate("/profile", { replace: true });
+    if (user) {
+      setForm({
+        username: user.username || "",
+        name: user.name || "",
+        bio: user.bio || ""
+
+      });
     }
-  }, [isOwnProfile, navigate]);
+  }, [user]);
 
-  const [user, setUser] = useState(null);
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-  useEffect(() => {
-    if (id && !isOwnProfile) {
-      fetchProfile();
-      fetchPosts();
-    }
-  }, [id, isOwnProfile]);
-
-  const fetchProfile = async () => {
-    const res = await API.get(`/auth/users/${id}/userProfile`);
-    setUser(res.data);
-  };
-
-  const fetchPosts = async () => {
     try {
-      const res = await API.get(`/auth/posts/user/${id}`);
-      setPosts(res.data || []);
+      const data = new FormData();
+      data.append("username", form.username);
+      data.append("name", form.name);
+      data.append("bio", form.bio)
+      if (file) data.append("profilePic", file);
+
+      await API.put("/auth/profile", data);
+      navigate('/profile')
+      toast.success("Profile Updated")
+
+
+      onUpdated();
+      onClose && onClose();
+    } catch (err) {
+      toast.err("Update Failed")
     } finally {
       setLoading(false);
     }
   };
 
-  const startChat = async () => {
-    if (isOwnProfile) return;
-    const res = await API.get(`/auth/conversation/${id}`);
-    navigate(`/messages/${res.data._id}`);
-  };
-
-  if (isOwnProfile) return null;
-  if (loading) return <p className="text-center mt-10 text-gray-400">Loading...</p>;
-  if (!user) return <p className="text-center mt-10">User not found</p>;
-
   return (
-    <div className="min-h-screen bg-gray-50 pt-24 pb-10 px-4">
-      <div className="max-w-6xl mx-auto">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white rounded-2xl shadow-md p-6 mt-10 max-w-xl mx-auto space-y-4 "
+    >
+      <h3 className="text-xl font-semibold text-center">Update Profile</h3>
 
-        <div className="bg-white rounded-2xl shadow-md p-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+      <input
+        className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+        value={form.username}
+        placeholder="Username"
+        onChange={(e) =>
+          setForm({ ...form, username: e.target.value })
+        }
+        required
+      />
 
-            {/* LEFT */}
-            <div className="flex flex-col sm:flex-row items-center gap-6">
-              <img
-                src={user.profilePic || DefaultProfile}
-                alt="profile"
-                className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-[#FAD4CF]"
-              />
+      <input
+        className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+        value={form.name}
+        placeholder="Name"
+        onChange={(e) =>
+          setForm({ ...form, name: e.target.value })
+        }
+        required
+      />
+      <input
+        className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+        value={form.bio}
+        placeholder="Share your thoughts"
+        onChange={(e) =>
+          setForm({ ...form, bio: e.target.value })
+        }
+        required
+      />
+ <label className="border-2 border-dashed rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 transition">
+          <span className="text-gray-500 text-sm">
+            Click to upload Profile Pic
+          </span>
+         <input
+        type="file"
+        className="w-full hidden"
+        onChange={(e) => setFile(e.target.files[0])}
+      />
+        </label>
+      
 
-              <div className="text-center sm:text-left">
-                <h2 className="text-2xl font-semibold text-gray-800">
-                  {user.name}
-                </h2>
+      <div className="flex gap-3">
+        <button
+          type="submit"
+          disabled={loading}
+          className="flex-1 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-60"
+        >
+          {loading ? "Saving..." : "Save Changes"}
+        </button>
 
-                <p className="text-sm font-medium text-[#F36B5E]">
-                  @{user.username}
-                </p>
-
-                {user.bio && (
-                  <p className="text-sm text-gray-600 mt-1 max-w-sm">
-                    {user.bio}
-                  </p>
-                )}
-
-                {!isOwnProfile && (
-                  <div className="mt-4 flex flex-wrap justify-center sm:justify-start gap-3">
-                    <FollowButton
-                      userId={id}
-                      currentUserId={loggedInUserId}
-                      isInitiallyFollowing={user.isFollowed}
-                      className="px-5 py-2 rounded-full bg-[#F36B5E] text-white text-sm font-medium hover:bg-[#E85A4F]"
-                    />
-
-                    <button
-                      onClick={startChat}
-                      className="px-5 py-2 rounded-full border border-[#F36B5E] text-[#F36B5E] text-sm font-medium hover:bg-[#FFF1EE] transition"
-                    >
-                      Message
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            
-
-            <div className="flex flex-col items-center md:items-end gap-4">
-              <div className="flex gap-6 text-sm">
-                <Link
-                  to={`/followers/${user._id}`}
-                  className="flex gap-1 hover:text-[#F36B5E] transition"
-                >
-                  <span className="font-bold text-gray-800">
-                    {user.followersCount}
-                  </span>
-                  <span className="text-gray-600">Followers</span>
-                </Link>
-
-                <Link
-                  to={`/following/${user._id}`}
-                  className="flex gap-1 hover:text-[#F36B5E] transition"
-                >
-                  <span className="font-bold text-gray-800">
-                    
-                    {user.followingCount}
-                  </span>
-                  <span className="text-gray-600">Following</span>
-                </Link>
-              </div>
-
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {posts.length === 0 ? (
-            <p className="text-center col-span-full text-gray-400">
-              No posts yet
-            </p>
-          ) : (
-            posts.map(post => (
-              <PostCard
-                key={post._id}
-                post={post}
-                currentUserId={loggedInUserId}
-                refresh={fetchPosts}
-              />
-            ))
-          )}
-        </div>
-
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 py-2 rounded-full bg-gray-100 hover:bg-gray-200"
+          >
+            Cancel
+          </button>
+        )}
       </div>
-    </div>
+    </form>
   );
 };
 
-export default UserProfile;
+export default UpdateProfile;
