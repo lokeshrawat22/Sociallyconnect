@@ -144,7 +144,7 @@ const UserProfile = () => {
           </div>
         </div>
 
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-items-center">
           {posts.length === 0 ? (
             <p className="text-center col-span-full text-gray-400">
               No posts yet
