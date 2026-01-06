@@ -38,7 +38,7 @@ const CommentPost = ({ postId, refresh }) => {
   }, []);
 
   return (
-    <div className="flex flex-col h-[420px]  ">
+    <div className="flex flex-col h-105  ">
       {/* HEADER */}
       <div className="border-b pb-2 mb-3">
         <h3 className="font-semibold text-lg text-center">
