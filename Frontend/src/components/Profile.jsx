@@ -25,8 +25,8 @@ const Profile = () => {
 
   if (!user)
     return (
-      <p className="text-center mt-10 text-gray-400">
-        Loading...
+      <p className="text-center mt-10 text-gray-400 opacity-65">
+        Create or login to your acc...
       </p>
     );
 
