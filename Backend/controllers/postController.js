@@ -148,3 +148,29 @@ exports.getPostComments = async (req, res) => {
     });
   }
 };
+
+
+exports.deletePost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    
+    if (post.user.toString() !== req.user.id.toString()) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    /* await cloudinary.uploader.destroy(post.mediaPublicId);*/
+
+    await post.deleteOne();
+
+
+    res.json({ message: "Post deleted successfully" });
+  } catch (err) {
+    console.error("DELETE POST ERROR:", err);
+    res.status(500).json({ error: "Failed to delete post" });
+  }
+};
