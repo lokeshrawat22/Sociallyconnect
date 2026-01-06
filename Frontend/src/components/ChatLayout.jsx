@@ -6,13 +6,14 @@ const ChatLayout = () => {
   const isChatOpen = location.pathname !== "/messages";
 
   return (
-    <div className="flex h-[calc(100vh-120px)] bg-gray-50">
+    <div className="flex h-[75vh] bg-gray-50 overflow-hidden ">
+
 
       {/* LEFT: CHAT LIST */}
       <div
         className={`
           ${isChatOpen ? "hidden md:flex" : "flex"}
-          w-full md:w-[340px]
+          w-full md:w-85
           bg-white border-r
         `}
       >
@@ -22,14 +23,14 @@ const ChatLayout = () => {
       {/* RIGHT: CHAT WINDOW */}
       <div
         className={`
-          ${isChatOpen ? "flex" : "hidden md:flex"}
+          ${isChatOpen ? "flex" : "hidden md:flex z-0"}
           flex-1 flex flex-col
-          bg-gray-50
+          bg-gray-50 
         `}
       >
-        {/* Empty State (Desktop only) */}
+
         {!isChatOpen && (
-          <div className="hidden md:flex flex-1 items-center justify-center text-center  ">
+          <div className="hidden md:flex flex-1 items-center justify-center text-center overflow-hidden ">
             <div className="object-cover opacity-50">
               <img
                 src={navlogo}
@@ -43,7 +44,6 @@ const ChatLayout = () => {
           </div>
         )}
 
-        {/* ACTIVE CHAT */}
         <Outlet />
       </div>
     </div>
