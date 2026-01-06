@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import API from "../api";
 import socket from "../services/socket";
 import { getUserId } from "../utils/auth";
+import DefaultProfile from '../assets/defaultprofile.webp' 
 
 export default function ChatList() {
   const [chats, setChats] = useState([]);
@@ -26,18 +27,18 @@ export default function ChatList() {
   }, []);
 
   return (
-    <div className="w-full md:w-[340px] bg-white border-r flex flex-col mt-9 ">
+    <div className="w-full md:w-85 bg-white border-r flex flex-col h-full overflow-hidden mt-3">
 
-      {/* HEADER */}
-      <div className="px-5   font-semibold text-gray-800 border-b justify-center flex items-center">
-         <span className="text-lg font-semibold text-blue-950">
-               
-                Socially <span className="text-cyan-500">Connect</span>
-              </span> <span className="opacity-50">- messages</span>
-      </div>
+
+  <div className="px-5 py-3 font-semibold text-gray-800 border-b flex items-center justify-center">
+    <span className="text-lg font-semibold text-blue-950">
+      Socially <span className="text-cyan-500">Connect</span>
+    </span>
+    <span className="opacity-50 ml-1">- messages</span>
+  </div>
 
       {/* CHAT LIST */}
-      <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto">
         {chats.map((c) => {
           const other = c.members.find((m) => m._id !== userId);
           const online = onlineUsers.includes(other._id);
@@ -59,7 +60,7 @@ export default function ChatList() {
                   src={
                     other.profilePic
                     ||
-                       "/default-avatar.png"
+                       DefaultProfile
                   }
                   className="w-11 h-11 rounded-full object-cover"
                 />
