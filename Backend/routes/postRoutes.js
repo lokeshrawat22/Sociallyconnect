@@ -10,5 +10,5 @@ router.get("/posts/me" , authMidleware , getMyPosts)
 router.put('/posts/:id/like', authMidleware , likePost);
 router.post('/posts/:id/comment', authMidleware , addComment);
 router.get("/posts/:id/comments", authMidleware, getPostComments);
-router.delete("/posts/:id", authMiddleware, deletePost);
+router.delete("/posts/:id",  authMidleware, deletePost);
 module.exports = router;
